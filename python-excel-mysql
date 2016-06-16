@@ -1,0 +1,18 @@
+import xlrd,pymysql
+data = xlrd.open_workbook('name.xlsx')
+table = data.sheets()[0]
+# print(table.row_values(2))
+# print(table.nrows)
+rows = table.nrows
+conn =pymysql.connect(user='root',passwd='dbpassword',host='localhost',db='dbname')
+cur = conn.cursor()
+for i in range(2):
+    # print(table.row_values(i))
+    aa = table.row_values(i)
+    print(type(aa))
+    print(aa[0])
+    bb = aa[0]
+    test = cur.execute("INSERT INTO EMPLOYEE (FIRST_NAME) VALUE (%s)",bb)
+    conn.commit()
+cur.close()
+conn.close()
