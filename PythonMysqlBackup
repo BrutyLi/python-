@@ -1,0 +1,51 @@
+	#!/usr/bin/env python
+	#Author: Kevin Li ,李兴利
+	#CreateTime:2016-06-21
+	# 导入模块
+	import os,time,sys,datetime
+	from stat import *
+	# 设置变量
+	User = 'root'
+	Passwd = '123456'
+	MysqlDump = '/usr/bin/mysqldump'
+	Gzip = 'bin/gzip'
+	#备份数据库名称，可以写多个
+	MysqlDBname = ['leye',]
+	#Backup to dir
+	Tobackup = '/dbbak'
+	
+	for DB in MysqlDBname:
+	    #Backup file formart name
+	    Backfile = Tobackup + DB + '_' + time.strftime('%Y-%m-%d') + '.sql'
+	    Gzfile = Backfile + '.gz'
+	    if os.path.isfile(Gzfile):
+	        print(Gzfile+'is already backup')
+	    else:
+	        Back_command = MysqlDump + '-u' + User + '-p' + Passwd + '-p3306' + DB + '>' + Backfile
+	        if os.system(Back_command) ==0:
+	            print('Successful backup to ',DB + 'to' + Backfile)
+	        else:
+	            print('Backup  Failed.')
+	
+	# Delete back file
+	# show file list
+	filelist=[]
+	filelist=os.listdir(Tobackup)
+	# delete Gzfile 5 days ago
+	for i in range(len(filelist)):
+	    ft = time.gmtime(os.stat(Tobackup+filelist[i])[ST_MTIME])
+	    ftl=time.strftime('%Y-%m-%d',ft)
+	    year,month,day=ftl.split('-')
+	    ftll=datetime.datetime(int(year),int(month),int(day))
+	    localt=time.gmtime()
+	    localtl=time.strftime('%Y-%m-%d',localt)
+	    year,month,day=localtl.split('-')
+	    localtll=datetime.datetime(int(year),int(month),int(day))
+	    days=(localtll-ftll).days
+	    if days >7:
+	        try:
+	            os.remove(Tobackup+filelist[i])
+	            print ('delete is ok')
+	        except:
+	            log=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')+" remove "+Tobackup+filelist[i]+" fail \n"
+	            print (log)
